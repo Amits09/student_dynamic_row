@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Student extends Model
 {
     use HasFactory;
-    protected $fillable = ['name','country','state'];
+    protected $fillable = ['name','country','state','image'];
 
     public function state(){
         return $this->belongsTo(State::class); 

@@ -13,21 +13,29 @@ use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Counts;
 class StudentController extends Controller
 {
     public function submit(Request $request){
-       
         $name = $request->get('name');
         $country = $request->get('country');
         $state = $request->get('state');
-        $files= $request->file('image');
+        $files= $request->file('images');
 
       
 
         for($i=0;$i<count($name);$i++){
+
+            $image = $files[$i];
+            $imageName = time().'.'.$image->extension();
+    
+            // Move the uploaded image to a storage location (e.g., public/images)
+            $image->move(public_path('assets/images'), $imageName);
+
+
 
             $student = new Student();
 
             $student->name = $name[$i];
             $student->country_id = $country[$i];
             $student->state_id =  $state[$i];
+            $student->image =  $imageName;
             $student->save();
 
         }

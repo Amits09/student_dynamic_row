@@ -61,7 +61,7 @@
                                     <div class="col">
                                         <label for="exampleFormControlFile1">State</label>
                                         <select class="custom-select" name="state[]" id="state-dropdown1">
-                                            <option value="">Select State</option>1
+                                            <option selected disabled value="">Select State</option>1
                                           </select>
                                       </div>
                                 </td>
@@ -170,46 +170,48 @@
         }
     });
         $('#btn-submit').click(function() {
-            var formData = new FormData();
-            // Serialize form data
-            var formData = {
-                    name: [],
-                    country:[],
-                    state:[],
-                    image:[],
-                };
+            // var formData = new FormData();
+            // // Serialize form data
+            // var formData = {
+            //         name: [],
+            //         country:[],
+            //         state:[],
+            //         image:[],
+            //     };
 
                
+
+            var formData = new FormData();
         // Loop through each row and collect data
         $('#myTable tr').each(function() {
-                    formData.name.push($(this).find('input[name="name[]"]').val());
-                    formData.country.push($(this).find('select[name="country[]"]').val());
-                    formData.state.push($(this).find('select[name="state[]"]').val()); 
-                    // formData.image.push($(this).find('input[name="image[]"]')[0].files[0]);                                  
+                    // formData.name.push($(this).find('input[name="name[]"]').val());
+                    // formData.country.push($(this).find('select[name="country[]"]').val());
+                    // formData.state.push($(this).find('select[name="state[]"]').val()); 
+                    
+                    formData.append("name[]",$(this).find('input[name="name[]"]').val());
+                    formData.append("country[]",$(this).find('select[name="country[]"]').val());
+                    formData.append("state[]",$(this).find('select[name="state[]"]').val());
+                    formData.append("images[]",$(this).find('input[name="image[]"]')[0].files[0]);                                
                 });
-
-              
-
-console.log(formData);
 
             $.ajax({
                 url: "/submit",
                 type: "POST",
                 enctype: 'multipart/form-data',
                 data:  formData,
-                // contentType:'application/json',
+                contentType:'application/json',
                 dataType: "json",
-                // accept:'application/json',
+                accept:'application/json',
                 // cache: false,
-                // contentType: false,
-                // processData: false,
+                contentType: false,
+                processData: false,
                 success: function(response) {
                     // Handle the success response (e.g., show a success message)
                     // location.href= "http://127.0.0.1:8000/dashboard";
-                    window.location = "/dashboard";
+                    window.location = "http://127.0.0.1:8000/dashboard";
                 },
                         error: function(xhr, type, exception) { 
-                            // window.location = "http://127.0.0.1:8000/dashboard";
+                            window.location = "http://127.0.0.1:8000/dashboard";
         }
                
             });
