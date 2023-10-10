@@ -22,4 +22,5 @@ Route::get('/', function () {
 Route::get('/dashboard',[StudentController::class,'index']);
 
 Route::post('/submit',[StudentController::class,'submit']);
+Route::post('/fetch-states', [StudentController::class, 'fetchState']);
 

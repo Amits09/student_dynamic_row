@@ -21,7 +21,7 @@
     <div class="container">
         <div class="card mt-4 px-2 py-2">
             <div class="mt-2 mb-2 ml-2">
-                <button id="addRow" class="btn btn-primary">Add</button>
+                <button id="addRow"  class="btn btn-primary">Add</button>
                 <button id="btn-submit" class="btn btn-primary">Save</button>
 
             </div>
@@ -30,21 +30,29 @@
                     @csrf
                     <div class="form-row">
                         <table id="myTable">
-                            <tr>
+                            <tr row="1" id="row_id1">
                                 <td>
                                     <div class="col">
                                         <label for="exampleFormControlFile1">Name</label>
-                                        <input type="text" class="form-control name">
+                                        <input type="text" class="form-control" name="name[]">
                                      </div>
                                 </td>
                                  
                                 <td>
                                     <div class="col">
-                                        <label for="exampleFormControlFile1" id="country">Country</label>
-                                        <select class="custom-select country">
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
+                                        <label for="exampleFormControlFile1" >Country</label>
+                                        <select class="custom-select" select_count = "1"  id="country-dropdown" onchange="change_country(this,this.getAttribute('select_count'))" name="country[]">
+                                            <option selected disabled value="">Select Country</option>
+                                                @php
+                                             {{ $countries= App\Models\Country::get(); }} 
+                                                @endphp
+                                            @endphp
+                                            @foreach ($countries as $key => $value)
+                                            {{ $key }}
+                                                <option value="{{ $value->id }}" {{ ( $key == $key) ?  : '' }}> 
+                                                    {{ $value->country_name }} 
+                                                </option>
+                                          @endforeach    
                                           </select>
                                       </div>
                                 </td>
@@ -52,11 +60,8 @@
                                 <td>
                                     <div class="col">
                                         <label for="exampleFormControlFile1">State</label>
-                                        <select class="custom-select state">
-                                            <option selected>Select State</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
+                                        <select class="custom-select" name="state[]" id="state-dropdown1">
+                                            <option value="">Select State</option>1
                                           </select>
                                       </div>
                                 </td>
@@ -65,7 +70,7 @@
                                     <div class="col"><form>
                                         <div class="form-group">
                                             <label for="exampleFormControlFile1">Image</label>
-                                            <input type="file" class="form-control-file image" id="exampleFormControlFile1">
+                                            <input type="file" class="form-control-file" name="image[]" id="img">
                                           </div>
                                 </td>
                                  
@@ -86,21 +91,33 @@
 
     
     $("#addRow").click(function() {
-        var newRow = $(`<tr>
+    
+        let count_row =  $('table tr:last') 
+                  .attr('row');
+        count_row++   
+       
+
+        var newRow = $(`<tr id="row_id${count_row}" row=${count_row}>
                                 <td>
                                     <div class="col">
                                         <label for="exampleFormControlFile1">Name</label>
-                                        <input type="text" class="form-control name">
+                                        <input type="text" class="form-control" name="name[]">
                                      </div>
                                 </td>
                                  
                                 <td>
                                     <div class="col">
                                         <label for="exampleFormControlFile1">Country</label>
-                                        <select class="custom-select country">
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
+                                        <select class="custom-select" select_count=${count_row} id="country-dropdown${count_row}" name="country[]" onchange="change_country(this,this.getAttribute('select_count'))">
+                                            @php
+                                             {{ $countries= App\Models\Country::get(); }} 
+                                                @endphp
+                                            @endphp
+                                            @foreach ($countries as $key => $value)
+                                                <option value="{{ $value->id }}" {{ ( $key == $key) ?  : '' }}> 
+                                                    {{ $value->country_name }} 
+                                                </option>
+                                          @endforeach    
                                           </select>
                                       </div>
                                 </td>
@@ -108,11 +125,8 @@
                                 <td>
                                     <div class="col">
                                         <label for="exampleFormControlFile1">State</label>
-                                        <select class="custom-select state">
-                                            <option selected>Select State</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
+                                        <select class="custom-select" name="state[]" id="state-dropdown${count_row}">
+                                            <option value="">Select State</option>
                                           </select>
                                       </div>
                                 </td>
@@ -121,7 +135,7 @@
                                     <div class="col"><form>
                                         <div class="form-group">
                                             <label for="exampleFormControlFile1">Image</label>
-                                            <input type="file" class="form-control-file image">
+                                            <input type="file" class="form-control-file" name="image[]" id="img">
                                           </div>
                                 </td>
                                 <td><button class="btn btn-danger removeRow">Remove</button></td>
@@ -129,8 +143,6 @@
             </tr>`);
         $("#myTable").append(newRow);
        
-
-        
     });
 });
 </script>
@@ -146,6 +158,9 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
 <script>
     $(document).ready(function() {
 
@@ -155,58 +170,86 @@
         }
     });
         $('#btn-submit').click(function() {
+            var formData = new FormData();
             // Serialize form data
+            var formData = {
+                    name: [],
+                    country:[],
+                    state:[],
+                    image:[],
+                };
 
-            let name = [];
-
-                // Loop through each input element and push its value to the array
-                $('.name').each(function() {
-                    name.push($(this).val());
+               
+        // Loop through each row and collect data
+        $('#myTable tr').each(function() {
+                    formData.name.push($(this).find('input[name="name[]"]').val());
+                    formData.country.push($(this).find('select[name="country[]"]').val());
+                    formData.state.push($(this).find('select[name="state[]"]').val()); 
+                    // formData.image.push($(this).find('input[name="image[]"]')[0].files[0]);                                  
                 });
 
-            let country=[];    
-                  // Loop through each input element and push its value to the array
-                  $('.country').each(function() {
-                    country.push($(this).val());
-                });
+              
 
-            let state=[];    
-                // Loop through each input element and push its value to the array
-                $('.state').each(function() {
-                    state.push($(this).val());
-            });
-           
-            let image=[];    
-                // Loop through each input element and push its value to the array
-                $('.image').each(function() {
-                    image.push($(this).val());
-            });
-          
+console.log(formData);
+
             $.ajax({
                 url: "/submit",
                 type: "POST",
                 enctype: 'multipart/form-data',
-                data: {
-                    name: JSON.stringify(name),
-                    country: JSON.stringify(country),
-                    state: JSON.stringify(state),
-                    image: JSON.stringify(image),
-                },
+                data:  formData,
+                // contentType:'application/json',
                 dataType: "json",
+                // accept:'application/json',
+                // cache: false,
+                // contentType: false,
+                // processData: false,
                 success: function(response) {
                     // Handle the success response (e.g., show a success message)
-                    alert(response.message);
+                    // location.href= "http://127.0.0.1:8000/dashboard";
+                    window.location = "/dashboard";
                 },
-                error: function(xhr) {
-                    // Handle the error response (e.g., display validation errors)
-                    var errors = xhr.responseJSON.errors;
-                    console.log(errors);
-                }
+                        error: function(xhr, type, exception) { 
+                            // window.location = "http://127.0.0.1:8000/dashboard";
+        }
+               
             });
         });
     });
     </script>
-  
+
+
+<script>
+
+    function change_country(e,select_count){
+        var idCountry = e.value;
+        // alert(e.select_count.value);
+            $("#state-dropdown").html('');
+            $.ajax({
+                url: "{{url('/fetch-states')}}",
+                type: "POST",
+                data: {
+                    country_id: idCountry,  
+                    _token: '{{csrf_token()}}'
+                },
+                dataType: 'json',
+                success: function (result) {
+                    $('#state-dropdown'+select_count).html('<option value="">-- Select State --</option>');
+                    $.each(result.states, function (key, value) {
+                        $("#state-dropdown"+select_count).append('<option value="' + value
+                            .id + '">' + value.state_name + '</option>');
+                    });
+                    $('#city-dropdown').html('<option value="">-- Select City --</option>');
+                }
+            });
+        }
+            
+   
+</script>
+
+
+
+
+
 
     </body>
 </html>

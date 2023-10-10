@@ -21,6 +21,7 @@ return new class extends Migration
             $table->index('state_id');
             $table->foreign('state_id')->references('id')->on('states');
             $table->timestamps();
+            $table->string('image');
         });
     }
 

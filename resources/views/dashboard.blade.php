@@ -33,7 +33,7 @@
                     <th>Name</th>
                     <th>Country</th>
                     <th>State</th>
-                    <th width="105px">Action</th>
+                    <th>Image</th>
                 </tr>
             </thead>
             <tbody>
@@ -55,9 +55,11 @@
               columns: [
                   {data: 'id', name: 'id'},
                   {data: 'name', name: 'name'},
-                  {data: 'country_id', name: 'country'},
-                  {data: 'state_id', name: 'state'},
-                  {data: 'action', name: 'action', orderable: false, searchable: false},
+                  {data: 'country_name', name: 'country_name'},
+                  {data: 'state_name', name:'state_name'},
+                  {data: 'image', name: 'image'},
+
+                //   {data: 'action', name: 'action', orderable: false, searchable: false},
               ]
           });
             
